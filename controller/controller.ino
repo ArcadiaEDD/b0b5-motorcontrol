@@ -3,7 +3,6 @@
 #define ENA 11
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
 
   //
@@ -16,14 +15,17 @@ void setup() {
 
   Serial.println("Enable motor");
   digitalWrite(ENA, LOW);
-  delay(1000);
+  delay(200);
 
   //
 
   Serial.println("Direction set");
   digitalWrite(DIR, LOW);
-  delay(1000);
+  delay(200);
 }
+
+
+///
 
 int dirBin = 0; // 0 is clockwise, 1 is counterclockwise
 int pwmWidth = 300;
@@ -32,7 +34,31 @@ const int maxPWMWidth = 10000;
 
 void loop() {
 
-  // direction change if statement
+  updateDirection();
+  genPWM();
+
+}
+
+// helper functions
+
+void enableMotor(){
+  digitalWrite(ENA, LOw);
+  delay(200);
+}
+
+void disableMotor(){
+  digitalWrite(ENA, HIGH);
+  delay(200);
+}
+
+void updateSpeed(int pwmW){
+  if (pwmW >= minPWMWidth && pwmW <= maxPWMWidth){
+    pwmWidth = pwmW;
+  }
+}
+
+void updateDirection(){
+  // direction change
   if (digitalRead(DIR) != dirBin){
     digitalWrite(DIR, dirBin);
 
@@ -45,10 +71,14 @@ void loop() {
 
     delayMicroseconds(10);
   }
+}
 
+void genPWM(){
+  // PWM
   digitalWrite(PUL, LOW);
   delayMicroseconds(pwmWidth);
   digitalWrite(PUL, HIGH);
   delayMicroseconds(pwmWidth);
-
 }
+
+
