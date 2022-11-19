@@ -5,7 +5,7 @@
 #define DIR 10
 #define ENA 11
 int dirBin = 1; // 0 is clockwise, 1 is counterclockwise
-int pwmWidth = 2000;
+int pwmWidth = 8000;
 const int minPWMWidth = 40;
 const int maxPWMWidth = 10000;
 
@@ -92,8 +92,8 @@ bool hasFinishedRunning = false;
 int loopOrderIndex = 0; // 0 is await ball, 1 is for aiming, 2 is for fire ball
 
 const int goalCount = 5;
-const int aimingTiming[] = {0, 100, 300, 200, 300};
-const int aimingDirection[] = {0, 1, 0, 1, 1}; // 1 is to right, 0 is left
+const int aimingTiming[] = {145, 95, 250, 100, 300};
+const int aimingDirection[] = {1, 1, 0, 1, 1}; // 1 is to right, 0 is left
 int aimingIndex = 0;
 int aimingTimingCount = 0;
 
