@@ -18,9 +18,10 @@ const int maxPWMWidth = 10000;
 // servo macros
 #define SERVOPIN 6
 Servo srv;
-//int srvPos = 0;
 
-///
+/// NOTE FOR JEFFREY: ALWAYS INIT PROGRAM FROM THE VERY LEFT OF THE BOARD & MAKE SURE TO TURN OFF THE MOTOR (BY USING BREAKER NEXT TO BATTERY) BEFORE HAND-TURNING THE BASE
+/// ALSO, IN ORDER TO SAVE COMPETITION TIME, MAKE SURE WHEN ITS OUR TURN TO SET UP AT THE COMPETITION FIELD, DO NOT OFFICIALLY "START" (AND THEREBY STARTING THE COMPETITION TIMER)
+//  UNTIL YOU'VE ALIGNED WITH THE FIRST GOAL (THE LONGEST ONE THAT IS STRAIGHT FORWARD). 
 
 void setup() {
   Serial.begin(9600);
@@ -52,84 +53,50 @@ void setup() {
   pinMode(PSTB, OUTPUT);
 
   extendPiston();
-  
-  //
 
 }
 
-
-///
-  /*dirBin = getSwitchPressed();
-  updateDirection();*/
-   /*if (dirBin){
-    turnServoCW();
-  }
-  else{
-    turnServoCCW();
-  }
-
-  delay(500);*/
-
-  /*if (dirBin){
-    /*extendPiston();
-    Serial.println("pressed");
-    delay(2000);
-    retractPiston();
-    lockServo();
-  }
-
-  Serial.println("it");
-
-  delay(100);*/
+//
 
 bool hasFinishedRunning = false;
-int loopOrderIndex = 0; // 0 is await ball, 1 is for aiming, 2 is for fire ball
+int loopOrderIndex = 0; // 0 is for aiming, 1 is for await and fire ball
 
 const int goalCount = 5;
-const int aimingTiming[] = {145, 80, 260, 100, 225};
+
+const int aimingTiming[] = {145, 80, 260, 100, 225}; // starting from way left
 const int aimingDirection[] = {1, 1, 0, 1, 1}; // 1 is to right, 0 is left
 int aimingIndex = 0;
 int aimingTimingCount = 0;
 
 void loop() {
 
-  Serial.println("waiting for press");
+  /*Serial.println("waiting for press");
   if (getSwitchPressed()){
     Serial.println("fire");
     awaitBall();
     delay(2000);
     fireBall();
   }
-  delay(100);
+  delay(100);*/
 
-  /*if (!hasFinishedRunning){
-    if (loopOrderIndex == 0){
-      if (aimingIndex >= goalCount){
-        hasFinishedRunning = true;
-      }
-      else{
-        //awaitBall();
-        Serial.println("Delay");
-        delay(2000);
-        loopOrderIndex++;
-      }
-    }
-    else if (loopOrderIndex == 1){
+  if (!hasFinishedRunning){
+    if (loopOrderIndex == 0){ // aiming
       aimingIteration();
     }
-    else if (loopOrderIndex == 2){
+    else if (loopOrderIndex == 1){ // await ball, then shoot once switch is pressed
       awaitBall();
+      delay(100);
       fireBall();
-      loopOrderIndex++;
+      loopOrderIndex = 0;
     }
-    else{ // reset order
+    else{ // reset order, prob never going to get to this point but just incase
       loopOrderIndex = 0;
     }
   }
   else{
     Serial.println("Finished Running");
     delay(1000);
-  }*/
+  }
 
 }
 
@@ -145,7 +112,10 @@ void aimingIteration(){
 
     }
     else{
-      aimingIndex++;
+      Serial.print("Finished aiming for goal #");
+      Serial.println(aimingIndex+1);
+
+      aimingIndex++; // move onto next ball
       aimingTimingCount = 0;
       loopOrderIndex++;
     }
@@ -159,8 +129,8 @@ void awaitBall(){
   retractPiston();
   delay(100);
   while (!getSwitchPressed()){
-    Serial.print("awaiting ball for goal #");
-    //Serial.println(aimingIndex+1);
+    Serial.print("Awaiting ball for goal #");
+    Serial.println(aimingIndex+1);
     delay(1);
   }
 
@@ -170,13 +140,13 @@ void awaitBall(){
 void fireBall(){
   unlockServo();
 
+  delay(500);
+
   retractPiston();
   delay(10);
 
   extendPiston();
-  delay(1000);
-  retractPiston();
-  delay(1000);
+  delay(500);
 }
 
 // motor controller helper functions
