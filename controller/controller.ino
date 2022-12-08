@@ -1,25 +1,24 @@
 #include <Servo.h>
 
 // motor macros
-#define PUL 9
-#define DIR 10
-#define ENA 11
+#define PUL 5 // red
+#define DIR 4 // white
 int dirBin = 1; // 0 is clockwise, 1 is counterclockwise
 int pwmWidth = 8000;
 const int minPWMWidth = 40;
 const int maxPWMWidth = 10000;
 
 // microswitch macro
-#define MCROSWC 2
+#define MCROSWC 7
 
 // piston macros
-#define PSTA 4
-#define PSTB 5
+#define PSTA 2
+#define PSTB 3
 
 // servo macros
 #define SERVOPIN 6
 Servo srv;
-int srvPos = 0;
+//int srvPos = 0;
 
 ///
 
@@ -30,13 +29,6 @@ void setup() {
 
   pinMode(PUL, OUTPUT);
   pinMode(DIR, OUTPUT);
-  pinMode(ENA, OUTPUT);
-
-  //
-
-  Serial.println("Enable motor");
-  digitalWrite(ENA, LOW);
-  delay(200);
 
   //
 
@@ -48,7 +40,6 @@ void setup() {
 
   Serial.println("Attach servo");
   srv.attach(SERVOPIN);
-
   unlockServo();
 
   //
@@ -60,7 +51,10 @@ void setup() {
   pinMode(PSTA, OUTPUT);
   pinMode(PSTB, OUTPUT);
 
-  resetPiston();
+  extendPiston();
+  
+  //
+
 }
 
 
@@ -92,20 +86,31 @@ bool hasFinishedRunning = false;
 int loopOrderIndex = 0; // 0 is await ball, 1 is for aiming, 2 is for fire ball
 
 const int goalCount = 5;
-const int aimingTiming[] = {145, 95, 250, 100, 300};
+const int aimingTiming[] = {145, 80, 260, 100, 225};
 const int aimingDirection[] = {1, 1, 0, 1, 1}; // 1 is to right, 0 is left
 int aimingIndex = 0;
 int aimingTimingCount = 0;
 
 void loop() {
 
-  if (!hasFinishedRunning){
+  Serial.println("waiting for press");
+  if (getSwitchPressed()){
+    Serial.println("fire");
+    awaitBall();
+    delay(2000);
+    fireBall();
+  }
+  delay(100);
+
+  /*if (!hasFinishedRunning){
     if (loopOrderIndex == 0){
       if (aimingIndex >= goalCount){
         hasFinishedRunning = true;
       }
       else{
-        awaitBall();
+        //awaitBall();
+        Serial.println("Delay");
+        delay(2000);
         loopOrderIndex++;
       }
     }
@@ -113,6 +118,7 @@ void loop() {
       aimingIteration();
     }
     else if (loopOrderIndex == 2){
+      awaitBall();
       fireBall();
       loopOrderIndex++;
     }
@@ -123,7 +129,7 @@ void loop() {
   else{
     Serial.println("Finished Running");
     delay(1000);
-  }
+  }*/
 
 }
 
@@ -150,21 +156,21 @@ void aimingIteration(){
 }
 
 void awaitBall(){
+  retractPiston();
+  delay(100);
   while (!getSwitchPressed()){
     Serial.print("awaiting ball for goal #");
-    Serial.println(aimingIndex+1);
+    //Serial.println(aimingIndex+1);
     delay(1);
   }
 
   lockServo();
-  delay(1000);
 }
 
 void fireBall(){
-  delay(2000);
   unlockServo();
 
-  resetPiston();
+  retractPiston();
   delay(10);
 
   extendPiston();
@@ -174,16 +180,6 @@ void fireBall(){
 }
 
 // motor controller helper functions
-
-void enableMotor(){
-  digitalWrite(ENA, LOW);
-  delay(200);
-}
-
-void disableMotor(){
-  digitalWrite(ENA, HIGH);
-  delay(200);
-}
 
 void updateSpeed(int pwmW){
   if (pwmW >= minPWMWidth && pwmW <= maxPWMWidth){
@@ -210,30 +206,14 @@ void genPWM(){
 // servo helper function
 
 void lockServo(){ // holds servo up against the ball, CW
-   turnServoCW();
-   delay(355);
-   stopServo();
+  updateServoPos(145);
+  delay(500);
 }
 
-void unlockServo(){ // gets out of the way of the ball, CCW
-  turnServoCCW();
-  delay(1000);
-  stopServo();
-}
-
-void turnServoCW(){
-  //Serial.println("CW");
-  updateServoPos(150);
-}
-
-void turnServoCCW(){
-  //Serial.println("CCW");
-  updateServoPos(40);
-}
-
-void stopServo(){
+void unlockServo(){
   //Serial.println("Stop");
-  updateServoPos(80);
+  updateServoPos(180);
+  delay(500);
 }
 
 void updateServoPos(int p){
@@ -243,7 +223,7 @@ void updateServoPos(int p){
 // switch helper functions
 
 int getSwitchPressed(){
-  return 1-digitalRead(MCROSWC);
+  return digitalRead(MCROSWC);
 }
 
 // pneumatic helper functions
@@ -254,12 +234,12 @@ void resetPiston(){
 }
 
 void retractPiston(){
-  digitalWrite(PSTA, LOW);
-  digitalWrite(PSTB, HIGH);
+  digitalWrite(PSTA, HIGH);
+  digitalWrite(PSTB, LOW);
 }
 
 void extendPiston(){
-  digitalWrite(PSTA, HIGH);
-  digitalWrite(PSTB, LOW);
+  digitalWrite(PSTA, LOW);
+  digitalWrite(PSTB, HIGH);
 }
 
