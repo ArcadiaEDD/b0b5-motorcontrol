@@ -63,7 +63,7 @@ int loopOrderIndex = 0; // 0 is for aiming, 1 is for await and fire ball
 
 const int goalCount = 5;
 
-const int aimingTiming[] = {145, 80, 260, 100, 225}; // starting from way left
+const int aimingTiming[] = {225, 65, 260, 80, 225}; // starting from way left
 const int aimingDirection[] = {0, 1, 0, 1, 1}; // 1 is to right, 0 is left
 int aimingIndex = 0;
 int aimingTimingCount = 0;
@@ -212,4 +212,3 @@ void extendPiston(){
   digitalWrite(PSTA, HIGH);
   digitalWrite(PSTB, LOW);
 }
-
