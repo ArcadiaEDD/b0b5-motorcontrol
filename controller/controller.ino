@@ -19,7 +19,7 @@ const int maxPWMWidth = 10000;
 #define SERVOPIN 6
 Servo srv;
 
-/// NOTE FOR JEFFREY: ALWAYS INIT PROGRAM FROM THE VERY LEFT OF THE BOARD & MAKE SURE TO TURN OFF THE MOTOR (BY USING BREAKER NEXT TO BATTERY) BEFORE HAND-TURNING THE BASE
+/// NOTE FOR JEFFREY: ALWAYS INIT PROGRAM FROM THE VERY RIGHT OF THE BOARD & MAKE SURE TO TURN OFF THE MOTOR (BY USING BREAKER NEXT TO BATTERY) BEFORE HAND-TURNING THE BASE
 /// ALSO, IN ORDER TO SAVE COMPETITION TIME, MAKE SURE WHEN ITS OUR TURN TO SET UP AT THE COMPETITION FIELD, DO NOT OFFICIALLY "START" (AND THEREBY STARTING THE COMPETITION TIMER)
 //  UNTIL YOU'VE ALIGNED WITH THE FIRST GOAL (THE LONGEST ONE THAT IS STRAIGHT FORWARD). 
 
@@ -52,7 +52,7 @@ void setup() {
   pinMode(PSTA, OUTPUT);
   pinMode(PSTB, OUTPUT);
 
-  extendPiston();
+  retractPiston();
 
 }
 
@@ -64,7 +64,7 @@ int loopOrderIndex = 0; // 0 is for aiming, 1 is for await and fire ball
 const int goalCount = 5;
 
 const int aimingTiming[] = {145, 80, 260, 100, 225}; // starting from way left
-const int aimingDirection[] = {1, 1, 0, 1, 1}; // 1 is to right, 0 is left
+const int aimingDirection[] = {0, 1, 0, 1, 1}; // 1 is to right, 0 is left
 int aimingIndex = 0;
 int aimingTimingCount = 0;
 
@@ -204,12 +204,12 @@ void resetPiston(){
 }
 
 void retractPiston(){
-  digitalWrite(PSTA, HIGH);
-  digitalWrite(PSTB, LOW);
+  digitalWrite(PSTA, LOW);
+  digitalWrite(PSTB, HIGH);
 }
 
 void extendPiston(){
-  digitalWrite(PSTA, LOW);
-  digitalWrite(PSTB, HIGH);
+  digitalWrite(PSTA, HIGH);
+  digitalWrite(PSTB, LOW);
 }
 
